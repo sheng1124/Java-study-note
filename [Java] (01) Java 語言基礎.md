@@ -39,7 +39,7 @@
         {
             System.out.println("汪");
         }
-        static void move()//類別方法
+        static void main()//類別方法
         {
         //.....;
         }
