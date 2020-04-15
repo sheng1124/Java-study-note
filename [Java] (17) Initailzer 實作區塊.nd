@@ -1,0 +1,124 @@
+# [Java] (17) Initailzer 實作區塊
+## 實作區塊
+* 前言
+    * 當需要超載建構子時，有些屬性的建構方式與原本的建構子一樣，這時候就想要不想再重寫一樣的東西
+* 說明
+    * 分為兩種，instance initializer 、static initializer
+    * static initializer 不可以存取或初始實體物件變數，在 instance initializer 可以存取 static、non-static 成員
+## instance initializer
+* 說明
+    * 用來在建構子中初始實體物件屬性
+    * 所有的建構子都先使用這段實作的區塊
+* 範例
+    ```java=
+    public class Sample
+    {
+        String id;
+        int birthday;
+        String name;
+        
+        Sample() {}//並非抽象方法，（抽象方法須加;）因為有 instance initializer 所以可以不用在{}中加入東西
+        Sample( int kind ) {}
+        
+        {
+            id = "A123456";
+            birthday = 0101;
+            name = "hhhh"
+        }
+    }
+    ```
+    * 編譯器會在編譯時將 initializer 內的程式碼複製到所有建構子當中
+    ```java=
+    public class Sample
+    {
+        String id;
+        int birthday;
+        String name;
+        
+        Sample()
+        {
+            id = "A123456";
+            birthday = 0101;
+            name = "hhhh"
+        }
+        
+        Sample( int kind )
+        {
+            id = "A123456";
+            birthday = 0101;
+            name = "hhhh"
+        }
+    }
+    ```
+    * 若建構子已針對 id 初始
+    ```java=
+    Sample(int kind)
+    {
+        id = "B444555";
+    }
+    ```
+    * 經過 initializer 的複製會成為
+    ```java=
+    Sample(int kind)
+    {
+        id = "A123456";
+        birthday = 0101;
+        name = "hhhh"
+        id = "B444555";
+    }
+    ```
+    * id 被設定2次，效率可能會變慢
+## static initializer
+* 說明
+    * 針對static成員變數的初始，在類別中使用而非方法中
+    * 又稱為 static block
+    * 於類別載入時執行且只執行一次
+* 範例
+    ```java=
+    static // instance initializer 多加了 static 敘述
+    {
+        初始化 static 成員變數內容
+    }
+    ```
+    * enum 的反組譯可以看到 static initializer 對列舉元初始化
+     ```java=
+    public final class Week extends Enum
+    {
+        private Week(String s, int i)
+        {
+            super(s, i)
+        }
+        
+        public static final Week Sunday;
+        public static final Week Monday;
+        public static final Week Tuesday;
+        
+        private static final Week $VALUES[];
+        
+        public static final Week[] values()
+        {
+            return (Week[])$VALUES.clone();
+        }
+        
+        public static Week valueOf(String s)
+        {
+            return (Week)enum.valueOf(Week, s);
+        }
+        
+        static // static initializer
+        {
+            Sunday = new Week("Sunday", 0);
+            Monday = new Week("Monday", 1);
+            Tuesday = new Week("Tuesday", 2);
+            
+            $VALUES = 
+            (
+                new Week[] 
+                {
+                    Sunday, Monday, Tuesday
+                }
+            );
+        }
+    }
+    ```
+###### tags: `Java 學習筆記`
